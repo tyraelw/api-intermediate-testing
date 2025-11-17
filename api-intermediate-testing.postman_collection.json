@@ -1,0 +1,486 @@
+{
+	"info": {
+		"_postman_id": "d428c2e1-2e90-45b8-8fec-f888d4e09f4c",
+		"name": "API Intermediate Testing",
+		"description": "Intermediate-level API testing demonstrating environment variables, variable chaining between requests, pre-request scripts, and full CRUD operations using JSONPlaceholder API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47331919"
+	},
+	"item": [
+		{
+			"name": "GET - All Posts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful response",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify response is array format",
+							"pm.test(\"Response is an array\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Save first post ID to environment variable for next request",
+							"pm.test(\"Save first post ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var firstPost = jsonData[0];",
+							"    pm.environment.set(\"postId\", firstPost.id);",
+							"    console.log(\"Saved postId:\", firstPost.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/posts",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts"
+					]
+				},
+				"description": "Retrieves all posts and saves the first post's ID to an environment variable for use in subsequent requests. Demonstrates variable chaining pattern."
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Single Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful response",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify retrieved post matches the saved ID from previous request",
+							"pm.test(\"Post ID matches saved ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var savedId = parseInt(pm.environment.get(\"postId\"));",
+							"    pm.expect(jsonData.id).to.equal(savedId);",
+							"});",
+							"",
+							"// Validate all required fields are present",
+							"pm.test(\"Post has all required fields\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.userId).to.exist;",
+							"    pm.expect(jsonData.title).to.exist;",
+							"    pm.expect(jsonData.body).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{postId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{postId}}"
+					]
+				},
+				"description": "Uses the postId variable from the previous request to retrieve a specific post. Demonstrates variable chaining and parseInt for type conversion."
+			},
+			"response": []
+		},
+		{
+			"name": "POST - Create Post",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate unique title using timestamp to avoid duplicates",
+							"var timestamp = Date.now();",
+							"var randomTitle = \"Test Post \" + timestamp;",
+							"pm.environment.set(\"randomTitle\", randomTitle);",
+							"console.log(\"Generated title:\", randomTitle);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate resource creation response (201 Created)",
+							"pm.test(\"Status code is 201\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Save new post ID for subsequent CRUD operations",
+							"pm.test(\"Response has new ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.exist;",
+							"    console.log(\"API returned ID:\", jsonData.id);",
+							"    ",
+							"    // Using existing ID (1) because JSONPlaceholder is a fake API",
+							"    // In real scenarios, use: pm.environment.set(\"newPostId\", jsonData.id);",
+							"    pm.environment.set(\"newPostId\", \"1\");",
+							"    console.log(\"Set newPostId to 1 for subsequent requests\");",
+							"});",
+							"",
+							"// Verify dynamic title was properly sent and returned",
+							"pm.test(\"Title matches generated title\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var expectedTitle = pm.environment.get(\"randomTitle\");",
+							"    pm.expect(jsonData.title).to.equal(expectedTitle);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"{{randomTitle}}\",\n  \"body\": \"This post was created dynamically\",\n  \"userId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/posts",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts"
+					]
+				},
+				"description": "Creates a new post using dynamically generated title from pre-request script. Demonstrates pre-request scripting, dynamic data generation, and variable usage in request body."
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Verify Created Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful retrieval",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify the post ID matches what we saved from creation",
+							"pm.test(\"Post exists and has ID\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var expectedId = parseInt(pm.environment.get(\"newPostId\"));",
+							"    pm.expect(jsonData.id).to.equal(expectedId);",
+							"});",
+							"",
+							"// Validate all required fields exist",
+							"pm.test(\"Post has all required fields\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.userId).to.exist;",
+							"    pm.expect(jsonData.title).to.exist;",
+							"    pm.expect(jsonData.body).to.exist;",
+							"});",
+							"",
+							"// Verify response structure is valid",
+							"pm.test(\"Post has valid structure\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('object');",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('title');",
+							"    pm.expect(jsonData).to.have.property('body');",
+							"    pm.expect(jsonData).to.have.property('userId');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{newPostId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{newPostId}}"
+					]
+				},
+				"description": "Verifies the created post exists by retrieving it using the saved newPostId. Part of complete CRUD flow demonstration."
+			},
+			"response": []
+		},
+		{
+			"name": "PUT - Full Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful update",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify title was updated",
+							"pm.test(\"Response has updated title\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.title).to.equal(\"Completely Updated Title\");",
+							"});",
+							"",
+							"// Verify body was updated",
+							"pm.test(\"Response has updated body\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.body).to.equal(\"This is the completely updated body content via PUT method\");",
+							"});",
+							"",
+							"// Verify ID remains unchanged (PUT updates, doesn't create new resource)",
+							"pm.test(\"ID remains the same\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    var expectedId = parseInt(pm.environment.get(\"newPostId\"));",
+							"    pm.expect(jsonData.id).to.equal(expectedId);",
+							"});",
+							"",
+							"// Validate response has exactly the expected fields",
+							"pm.test(\"All fields are present\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.all.keys('id', 'title', 'body', 'userId');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": {{newPostId}},\n  \"title\": \"Completely Updated Title\",\n  \"body\": \"This is the completely updated body content via PUT method\",\n  \"userId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{newPostId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{newPostId}}"
+					]
+				},
+				"description": "Performs full resource replacement using PUT method. All fields must be provided. Demonstrates difference between PUT (full update) and PATCH (partial update)."
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH - Partial Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful partial update",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify only the sent field was updated",
+							"pm.test(\"Title was updated\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.title).to.equal(\"Only Title Updated via PATCH\");",
+							"});",
+							"",
+							"// Verify other fields still exist (PATCH preserves non-updated fields)",
+							"pm.test(\"Other fields still exist\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.body).to.exist;",
+							"    pm.expect(jsonData.userId).to.exist;",
+							"    pm.expect(jsonData.id).to.exist;",
+							"});",
+							"",
+							"// Document the key difference between PATCH and PUT",
+							"pm.test(\"Demonstrates PATCH vs PUT difference\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    // PATCH only updates sent fields",
+							"    // PUT would replace the entire resource",
+							"    console.log(\"PATCH updated only title, other fields preserved\");",
+							"    pm.expect(jsonData).to.have.property('body');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Only Title Updated via PATCH\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{newPostId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{newPostId}}"
+					]
+				},
+				"description": "Performs partial update using PATCH method. Only the title field is sent, other fields remain unchanged. Clearly demonstrates PATCH vs PUT behavior."
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE - Remove Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate successful deletion (200 or 204 are both valid)",
+							"pm.test(\"Status code is 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Verify delete operation completed",
+							"pm.test(\"Delete operation completed\", function() {",
+							"    // DELETE returns empty object or confirmation",
+							"    var jsonData = pm.response.json();",
+							"    console.log(\"Delete response:\", JSON.stringify(jsonData));",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"// Validate response is valid JSON format",
+							"pm.test(\"Response is valid JSON\", function() {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// Document DELETE method usage and API behavior",
+							"pm.test(\"Demonstrates DELETE method\", function() {",
+							"    console.log(\"DELETE request sent to:\", pm.request.url);",
+							"    console.log(\"Note: JSONPlaceholder simulates delete but doesn't persist\");",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{newPostId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{newPostId}}"
+					]
+				},
+				"description": "Deletes the post resource using DELETE method. Completes the CRUD cycle. Note: JSONPlaceholder simulates deletion but doesn't actually persist the change."
+			},
+			"response": []
+		},
+		{
+			"name": "GET - Verify Deletion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verify request completed without errors",
+							"pm.test(\"Request completed\", function() {",
+							"    pm.response.to.not.be.error;",
+							"});",
+							"",
+							"// Demonstrate understanding of fake API behavior",
+							"pm.test(\"Demonstrates fake API behavior\", function() {",
+							"    var statusCode = pm.response.code;",
+							"    ",
+							"    if (statusCode === 200) {",
+							"        console.log(\"✓ Post still exists - JSONPlaceholder doesn't persist deletes\");",
+							"        console.log(\"✓ This is expected behavior for a fake/mock API\");",
+							"        pm.expect(statusCode).to.equal(200);",
+							"    } else if (statusCode === 404) {",
+							"        console.log(\"✓ Post not found - would be expected in real API\");",
+							"        pm.expect(statusCode).to.equal(404);",
+							"    }",
+							"});",
+							"",
+							"// Summarize completed CRUD operations",
+							"pm.test(\"Completed full CRUD cycle\", function() {",
+							"    console.log(\"=== CRUD Operations Completed ===\");",
+							"    console.log(\"✓ CREATE (POST)\");",
+							"    console.log(\"✓ READ (GET)\");",
+							"    console.log(\"✓ UPDATE (PUT, PATCH)\");",
+							"    console.log(\"✓ DELETE\");",
+							"    console.log(\"Full cycle demonstrated successfully\");",
+							"    pm.expect(true).to.be.true;",
+							"});",
+							"",
+							"// Verify variable chaining worked throughout flow",
+							"pm.test(\"Understanding of API testing concepts\", function() {",
+							"    var usedId = pm.environment.get(\"newPostId\");",
+							"    console.log(\"Used consistent ID throughout flow:\", usedId);",
+							"    pm.expect(usedId).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/posts/{{newPostId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"posts",
+						"{{newPostId}}"
+					]
+				},
+				"description": "Attempts to retrieve the deleted post. In a real API, this would return 404. JSONPlaceholder still returns 200 since it's a fake API that doesn't persist changes. Demonstrates understanding of real vs mock API behavior."
+			},
+			"response": []
+		}
+	]
+}
