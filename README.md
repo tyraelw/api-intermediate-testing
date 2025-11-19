@@ -4,23 +4,23 @@ An intermediate-level API testing collection demonstrating environment variables
 
 ## 📋 Project Overview
 
-This project showcases intermediate API testing skills including all HTTP methods (GET, POST, PUT, PATCH, DELETE), dynamic data generation, variable management across requests, and understanding of fake vs. real API behavior. It demonstrates a complete CRUD (Create, Read, Update, Delete) workflow with connected requests.
+This project showcases intermediate API testing patterns including all HTTP methods (GET, POST, PUT, PATCH, DELETE), dynamic data generation, variable management across requests, and understanding of fake vs. real API behavior. It demonstrates a complete CRUD (Create, Read, Update, Delete) workflow with connected requests.
 
-## 🎯 What I Learned
+## 🎯 Skills Demonstrated
 
-This collection demonstrates my ability to:
+This collection demonstrates proficiency in:
 
-- **Implement environment variables** for reusable configuration
-- **Chain variables between requests** to create connected workflows
-- **Write pre-request scripts** for dynamic data generation
-- **Use all HTTP methods** (GET, POST, PUT, PATCH, DELETE)
-- **Understand PUT vs PATCH** differences in update operations
-- **Convert data types** (parseInt) for proper comparisons
-- **Generate dynamic test data** using timestamps
-- **Work with complete CRUD cycles** in API testing
-- **Handle API response data** and save to variables
-- **Validate complex workflows** across multiple requests
-- **Understand fake API limitations** vs. real API behavior
+- **Implementing environment variables** for reusable configuration
+- **Chaining variables between requests** to create connected workflows
+- **Writing pre-request scripts** for dynamic data generation
+- **Using all HTTP methods** (GET, POST, PUT, PATCH, DELETE)
+- **Understanding PUT vs PATCH** differences in update operations
+- **Converting data types** (parseInt) for proper comparisons
+- **Generating dynamic test data** using timestamps
+- **Working with complete CRUD cycles** in API testing
+- **Handling API response data** and saving to variables
+- **Validating complex workflows** across multiple requests
+- **Understanding fake API limitations** vs. real API behavior
 
 ## 📊 Test Flow
 
@@ -234,7 +234,7 @@ pm.expect(jsonData.id).to.equal(savedId);
 **What is JSONPlaceholder?**
 - Free fake REST API for testing and prototyping
 - Simulates CRUD operations without persisting data
-- Perfect for learning and demonstrating API testing concepts
+- Perfect for demonstrating API testing concepts
 
 **Key Limitations:**
 - ✅ POST returns success (201) but doesn't actually save
@@ -243,7 +243,7 @@ pm.expect(jsonData.id).to.equal(savedId);
 - ✅ Subsequent GETs still return original data
 
 **Why This Matters:**
-This project demonstrates that I understand the difference between test/mock APIs and production systems. In a real scenario:
+This demonstrates understanding of the difference between test/mock APIs and production systems. In a real scenario:
 - Request 3 would create a real post with a unique ID
 - Requests 5-6 would permanently modify the post
 - Request 7 would permanently delete the post
@@ -251,35 +251,38 @@ This project demonstrates that I understand the difference between test/mock API
 
 The test logic is production-ready; only the API backend is simulated.
 
-## 📈 Progression from Basic to Intermediate
-
-### Basic API Testing (Previous Project)
-- ✅ Simple GET and POST requests
-- ✅ Independent requests
-- ✅ Basic validations
-- ✅ No variables
-- ✅ Static data
-
-### Intermediate API Testing (This Project)
-- ✅ All HTTP methods (GET, POST, PUT, PATCH, DELETE)
-- ✅ Connected request workflow
-- ✅ Environment variables
-- ✅ Variable chaining
-- ✅ Pre-request scripts
-- ✅ Dynamic data generation
-- ✅ Complete CRUD cycle
-- ✅ Advanced validation patterns
-
 ## 🔗 Related Projects
 
-- [Basic API Testing](../basic-api-testing) - Foundation API testing skills
-- [Trello API Advanced Testing](../trello-api-testing) - Real API with authentication
-- [Cypress Intermediate Tests](../cypress-intermediate-tests) - UI automation with data-driven patterns
+- [Basic API Testing](../basic-api-testing) - Core API testing patterns
+- [Trello API Testing](../trello-api-testing) - Real API with authentication and Newman
+- [Simple Grocery Store API](../simple-grocery-store-api-testing) - E-commerce flow validation
 
-## 📧 Questions?
+## 📌 Portfolio Context
 
-Feel free to reach out if you have questions about this project or want to discuss API testing patterns!
+This project is part of a structured portfolio demonstrating comprehensive API testing expertise across different complexity levels. While my advanced projects like [Trello API Testing](../trello-api-testing) showcase production-ready implementations with authentication, Newman CLI, and CI/CD, this collection focuses on intermediate patterns that bridge fundamental and advanced concepts.
+
+**Focus Area:** Intermediate API testing patterns
+- Complete CRUD operations
+- Environment variable management
+- Request chaining and data flow
+- Pre-request script automation
+- Dynamic test data generation
+
+**Related Skill Levels:**
+- **Fundamental:** [Basic API Testing](../basic-api-testing) - Core GET/POST patterns
+- **Advanced:** [Trello API Testing](../trello-api-testing) - Authentication, Newman, CI/CD, dynamic workflows
+
+## 📝 Notes
+
+- **API Used**: JSONPlaceholder - Free fake REST API for testing
+- **Purpose**: Demonstrates intermediate API testing patterns and request chaining
+- **Test Data**: Dynamically generated using timestamps
+- **No Authentication**: Focuses on CRUD operations and variable management
+
+## 📧 Contact
+
+For questions about this project or intermediate API testing patterns, feel free to reach out via [tyrael78w@gmail.com](mailto:tyrael78w@gmail.com)
 
 ---
 
-**Created as part of my QA Testing portfolio** | **Date: November 2025**
+**Part of QA Testing Portfolio** | **November 2025**
